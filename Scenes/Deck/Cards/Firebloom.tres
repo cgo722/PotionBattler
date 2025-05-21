@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardResource" load_steps=2 format=3 uid="uid://cmhlhmwa1rwbe"]
+
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards.gd" id="1_m8h7q"]
+
+[resource]
+script = ExtResource("1_m8h7q")
+card_name = "Firebloom"
+description = ""
+card_type = "Ingredient"
+tags = Array[String]([])
+effect_data = {}
+keywords = Array[String](["Burn"])
+metadata/_custom_type_script = "uid://428fppsn728g"

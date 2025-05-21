@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://dgvw1d7m831c1"]
+
+[ext_resource type="Script" uid="uid://bqlrbr0dqfdns" path="res://Scenes/Deck/hand_ui.gd" id="1_mfqba"]
+[ext_resource type="PackedScene" uid="uid://bgv20rd725a28" path="res://Scenes/Deck/CardUI.tscn" id="2_uokuc"]
+
+[node name="HandUi" type="HBoxContainer"]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -4.0
+offset_top = -8.0
+offset_right = 4.0
+grow_horizontal = 2
+grow_vertical = 0
+size_flags_vertical = 4
+script = ExtResource("1_mfqba")
+card_ui_scene = ExtResource("2_uokuc")
