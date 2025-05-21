@@ -12,6 +12,8 @@ enum GameState {
 @export var deck_node_path: NodePath = NodePath("Deck")
 var deck: Deck
 
+@export var potion_combiner : NodePath # Adjust path as needed
+
 var state: GameState = GameState.MENU
 @onready var hand_ui = $HandUi
 

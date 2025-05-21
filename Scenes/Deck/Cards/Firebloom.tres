@@ -6,8 +6,9 @@
 script = ExtResource("1_m8h7q")
 card_name = "Firebloom"
 description = ""
-card_type = "Ingredient"
+rarity = "Common"
 tags = Array[String]([])
-effect_data = {}
-keywords = Array[String](["Burn"])
+effectID = 1000
+effect_efficency = 5
+card_text = ""
 metadata/_custom_type_script = "uid://428fppsn728g"
