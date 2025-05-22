@@ -6,6 +6,9 @@
 script = ExtResource("1_liss2")
 character_name = "Test"
 starting_deck = {
-"Firebloom": 10
+"Deathcap": 5,
+"Firebloom": 5
 }
+starting_health = 100
+current_health = 100
 metadata/_custom_type_script = "uid://dthp3el6slhs8"

@@ -8,6 +8,11 @@ func setup(card_resource: CardResource):
 	card = card_resource
 	text = card.card_name
 	
+func _get_drag_data(_pos):
+	var drag_preview = duplicate()
+	set_drag_preview(drag_preview)
+	return card
+
 func _pressed():
 	var tray_ui = get_node(tray_ui_path)
 	if tray_ui and tray_ui.add_card_to_tray(card):

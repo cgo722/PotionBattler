@@ -2,11 +2,12 @@ extends HBoxContainer
 
 @export var hand_ui_path: NodePath # Set this to your HandUi node in the editor
 var slots: Array = []
-
+signal ingredients_selected(ingredients: Array)
 func _ready():
 	slots = [get_node("Slot0"), get_node("Slot1"), get_node("Slot2")]
 	for slot in slots:
 		slot.connect("pressed", Callable(self, "_on_slot_pressed").bind(slot))
+	get_node("VBoxContainer/CombineButton").connect("pressed", Callable(self, "on_combine_pressed"))
 
 func add_card_to_tray(card: CardResource) -> bool:
 	for slot in slots:
@@ -43,3 +44,17 @@ func clear_tray():
 		for child in slot.get_children():
 			child.queue_free()
 		slot.modulate = Color(0.5, 0.5, 0.5)
+
+func on_combine_pressed():
+	var ingredients: Array = []
+	var deck = get_tree().get_root().get_node("Gamemanager").deck
+	for slot in slots:
+		var card = slot.get_meta("card")
+		if card:
+			ingredients.append(card)
+			deck.discard_card(card) # Discard the card after combining
+	if ingredients.size() > 0:
+		emit_signal("ingredients_selected", ingredients)
+		clear_tray()
+	else:
+		print("No ingredients to combine!")
