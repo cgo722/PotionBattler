@@ -18,6 +18,10 @@ config/features=PackedStringArray("4.4", "Mobile")
 
 CardDatabase="*res://Scenes/Deck/DeckDatabase.gd"
 
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
 [rendering]
 
 renderer/rendering_method="mobile"
