@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CharacterResource" load_steps=2 format=3 uid="uid://toxr1pmpyxr4"]
+
+[ext_resource type="Script" uid="uid://dthp3el6slhs8" path="res://Scenes/Deck/Characters/CharacterResource.gd" id="1_xlvxs"]
+
+[resource]
+script = ExtResource("1_xlvxs")
+character_name = ""
+starting_deck = {}
+starting_health = 100
+current_health = 100
+metadata/_custom_type_script = "uid://dthp3el6slhs8"
