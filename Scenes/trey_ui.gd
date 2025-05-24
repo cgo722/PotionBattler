@@ -58,3 +58,27 @@ func on_combine_pressed():
 		clear_tray()
 	else:
 		print("No ingredients to combine!")
+
+func _can_drop_data(_pos, data):
+	if typeof(data) == TYPE_DICTIONARY and data.has("card_resource"):
+		return true
+	return false
+
+func _drop_data(_pos, data):
+	if typeof(data) == TYPE_DICTIONARY and data.has("card_resource"):
+		var card_resource = data["card_resource"]
+		if add_card_to_tray(card_resource):
+			# Remove from hand
+			var deck = get_tree().get_root().get_node("Gamemanager").deck
+			var hand_ui = get_node(hand_ui_path)
+			var removed = false
+			for i in range(deck.hand.size()):
+				if deck.hand[i] == card_resource:
+					deck.hand.remove_at(i)
+					removed = true
+					break
+			if removed:
+				print("Card removed from hand.")
+			else:
+				print("Card NOT found in hand!")
+			hand_ui.update_hand(deck.hand)
