@@ -1,14 +1,14 @@
-extends Button
+# In CardUI.gd
+extends Panel # or Control
 
 var card_resource
 
 func setup(card):
-	card_resource = card
+    card_resource = card
+    $CardNameLabel.text = card.card_name
+    # Set up visuals, etc.
 
 func _get_drag_data(_pos):
-	var drag_preview = duplicate()
-	set_drag_preview(drag_preview)
-	var card_data = {
-		"card_resource": card_resource # Make sure this is your CardResource
-	}
-	return card_data
+    var preview = duplicate()
+    set_drag_preview(preview)
+    return {"card_resource": card_resource}

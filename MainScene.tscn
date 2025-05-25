@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://bvhifu0m7tekn"]
+[gd_scene load_steps=8 format=3 uid="uid://bvhifu0m7tekn"]
 
 [ext_resource type="Script" uid="uid://jk31iindsom8" path="res://Gamemanager.gd" id="1_x4av3"]
 [ext_resource type="Script" uid="uid://c6b8lhbdwp54s" path="res://Scenes/Deck/Deck.gd" id="2_rpqi1"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://dgvw1d7m831c1" path="res://Scenes/Deck/HandUI.tscn" id="3_rpqi1"]
 [ext_resource type="PackedScene" uid="uid://diy7dm8wv1hs1" path="res://Scenes/TreyUI.tscn" id="5_rf2cd"]
 [ext_resource type="Script" uid="uid://da63ybcmhufc5" path="res://PotionCombiner.gd" id="6_a814b"]
+[ext_resource type="PackedScene" uid="uid://c2riw2te2tyyw" path="res://Scenes/Main Menu.tscn" id="7_5crlr"]
 
 [node name="Gamemanager" type="Node"]
 script = ExtResource("1_x4av3")
@@ -16,9 +17,13 @@ character_resource = ExtResource("2_uxrcv")
 script = ExtResource("2_rpqi1")
 
 [node name="HandUi" parent="." instance=ExtResource("3_rpqi1")]
+tray_ui_path = NodePath("../TrayUi")
 
 [node name="TrayUi" parent="." instance=ExtResource("5_rf2cd")]
 hand_ui_path = NodePath("../HandUi")
 
 [node name="PotionCombiner" type="Node" parent="."]
 script = ExtResource("6_a814b")
+
+[node name="MainMenu" parent="." instance=ExtResource("7_5crlr")]
+gamemanager = NodePath("..")

@@ -1,26 +1,19 @@
-# CardUI.gd
-extends Button
+extends Panel
 
-var card: CardResource
-@export var tray_ui_path: NodePath = NodePath("/root/Gamemanager/TrayUi") # Adjust path as needed
+signal card_clicked(card_resource)
 
-func setup(card_resource: CardResource):
-	card = card_resource
-	text = card.card_name
-	
+var card_resource
+
+func setup(card):
+	card_resource = card
+	$CardNameLabel.text = card.card_name
+	# Set up visuals, etc.
+
 func _get_drag_data(_pos):
-	var drag_preview = duplicate()
-	set_drag_preview(drag_preview)
-	return card
+	var preview = duplicate()
+	set_drag_preview(preview)
+	return {"card_resource": card_resource}
 
-func _pressed():
-	var tray_ui = get_node(tray_ui_path)
-	if tray_ui and tray_ui.add_card_to_tray(card):
-		var deck = get_tree().get_root().get_node("Gamemanager").deck
-		# Remove the exact instance from hand
-		deck.hand.erase(card)
-		var hand_ui = get_tree().get_root().get_node("Gamemanager").hand_ui
-		hand_ui.update_hand(deck.hand)
-		queue_free()
-	else:
-		print("Tray is full! Cannot add card.")
+func _gui_input(event):
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		emit_signal("card_clicked", card_resource)

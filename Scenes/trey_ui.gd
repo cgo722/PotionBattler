@@ -19,6 +19,7 @@ func add_card_to_tray(card: CardResource) -> bool:
 			var label = Label.new()
 			label.text = card.card_name
 			slot.add_child(label)
+			print(	"Card added to tray:", card.card_name)
 			return true
 	print("Tray is full!")
 	return false
@@ -52,33 +53,10 @@ func on_combine_pressed():
 		var card = slot.get_meta("card")
 		if card:
 			ingredients.append(card)
-			deck.discard_card(card) # Discard the card after combining
-	if ingredients.size() > 0:
+			deck.discard_card(card) # This is fine if it means discard pile, but don't remove from hand here!
+	if ingredients.size() > 2:
 		emit_signal("ingredients_selected", ingredients)
 		clear_tray()
 	else:
 		print("No ingredients to combine!")
-
-func _can_drop_data(_pos, data):
-	if typeof(data) == TYPE_DICTIONARY and data.has("card_resource"):
-		return true
-	return false
-
-func _drop_data(_pos, data):
-	if typeof(data) == TYPE_DICTIONARY and data.has("card_resource"):
-		var card_resource = data["card_resource"]
-		if add_card_to_tray(card_resource):
-			# Remove from hand
-			var deck = get_tree().get_root().get_node("Gamemanager").deck
-			var hand_ui = get_node(hand_ui_path)
-			var removed = false
-			for i in range(deck.hand.size()):
-				if deck.hand[i] == card_resource:
-					deck.hand.remove_at(i)
-					removed = true
-					break
-			if removed:
-				print("Card removed from hand.")
-			else:
-				print("Card NOT found in hand!")
-			hand_ui.update_hand(deck.hand)
+		
