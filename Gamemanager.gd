@@ -11,6 +11,8 @@ enum GameState {
     END_RUN
 }
 
+@export var possible_events: Array[Event] = []
+
 @export var deck_node_path: NodePath = NodePath("Deck")
 var deck: Deck
 
@@ -117,8 +119,9 @@ func player_turn():
 func enemy_turn():
     print("Enemy Turn")
     # Implement enemy actions here
-    # After enemy finishes, call next_phase()
 
+    # After enemy finishes, pass turn back to player
+    next_phase()
 func end_run():
     print("End of Run")
     # Show end screen or summary
@@ -127,7 +130,10 @@ func _on_ingredients_selected(ingredients: Array):
     var combiner_node = get_node(potion_combiner)
     var result = combiner_node.combine_ingredients(ingredients)
     print("Potion result: ", result)
-    next_phase()
+    enemy_turn() # Start enemy phase after combining
+
+func get_possible_events() -> Array:
+    return possible_events.duplicate() # Return a copy to avoid modifying the original
 
 func update_ui_visibility():
     var menu_ui = $MainMenu if has_node("MainMenu") else null
@@ -135,6 +141,7 @@ func update_ui_visibility():
     var tray_ui_node = $TrayUi if has_node("TrayUi") else null
     var shop_ui = $ShopUi if has_node("ShopUi") else null
     var event_ui = $EventUi if has_node("EventUi") else null
+    var situation_picker = $Situationpicker if has_node("Situationpicker") else null
 
     match state:
         GameState.MENU:
@@ -143,33 +150,51 @@ func update_ui_visibility():
             if tray_ui_node: tray_ui_node.visible = false
             if shop_ui: shop_ui.visible = false
             if event_ui: event_ui.visible = false
+            if situation_picker: situation_picker.visible = false
         GameState.RUNNING:
             if menu_ui: menu_ui.visible = false
             if hand_ui_node: hand_ui_node.visible = false
             if tray_ui_node: tray_ui_node.visible = false
             if shop_ui: shop_ui.visible = false
             if event_ui: event_ui.visible = false
+            if situation_picker: situation_picker.visible = false
         GameState.CHOOSE_EVENT:
             if menu_ui: menu_ui.visible = false
             if hand_ui_node: hand_ui_node.visible = false
             if tray_ui_node: tray_ui_node.visible = false
             if shop_ui: shop_ui.visible = false
             if event_ui: event_ui.visible = true
+            if situation_picker: situation_picker.visible = true
         GameState.SHOPPING:
             if menu_ui: menu_ui.visible = false
             if hand_ui_node: hand_ui_node.visible = false
             if tray_ui_node: tray_ui_node.visible = false
             if shop_ui: shop_ui.visible = true
             if event_ui: event_ui.visible = false
+            if situation_picker: situation_picker.visible = false
         GameState.BATTLE_DRAW_PHASE, GameState.BATTLE_PLAYER_TURN, GameState.BATTLE_ENEMY_TURN:
             if menu_ui: menu_ui.visible = false
             if hand_ui_node: hand_ui_node.visible = true
             if tray_ui_node: tray_ui_node.visible = true
             if shop_ui: shop_ui.visible = false
             if event_ui: event_ui.visible = false
+            if situation_picker: situation_picker.visible = false
         GameState.END_RUN:
             if menu_ui: menu_ui.visible = false
             if hand_ui_node: hand_ui_node.visible = false
             if tray_ui_node: tray_ui_node.visible = false
             if shop_ui: shop_ui.visible = false
             if event_ui: event_ui.visible = false
+            if situation_picker: situation_picker.visible = false
+
+func handle_event(event_data):
+    print("Handling event: ", event_data)
+    # Example: decide next state based on event type
+    if event_data.type == "shop":
+        state = GameState.SHOPPING
+    elif event_data.type == "battle":
+        state = GameState.BATTLE_DRAW_PHASE
+    else:
+        state = GameState.RUNNING # Or whatever fits your flow
+    update_ui_visibility()
+    next_phase()

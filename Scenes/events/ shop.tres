@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Event" load_steps=2 format=3 uid="uid://btqeuocl8vrmk"]
+
+[ext_resource type="Script" uid="uid://dcdicy44ariy8" path="res://Scenes/events/eventResource.gd" id="1_js5nq"]
+
+[resource]
+script = ExtResource("1_js5nq")
+name = "shop"
+type = "shop"
+description = ""
+metadata/_custom_type_script = "uid://dcdicy44ariy8"
