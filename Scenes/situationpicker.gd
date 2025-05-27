@@ -1,5 +1,7 @@
 extends HBoxContainer
 
+signal enemy_chosen(enemy_resource)
+
 var game_manager
 
 func _ready():
@@ -18,4 +20,11 @@ func randomize_buttons():
 
 func _on_event_button_pressed(event_data):
 	print("Event chosen: ", event_data)
+	if event_data.type == "battle":
+		var enemies = game_manager.enemies
+		if enemies.size() > 0:
+			var chosen_enemy = enemies[randi() % enemies.size()]
+			emit_signal("enemy_chosen", chosen_enemy)
+		else:
+			print("No enemies available!")
 	game_manager.handle_event(event_data)

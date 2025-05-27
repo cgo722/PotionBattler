@@ -1,14 +1,21 @@
-[gd_resource type="Resource" script_class="CharacterResource" load_steps=2 format=3 uid="uid://d0xarx881qp0"]
+[gd_resource type="Resource" script_class="CharacterResource" load_steps=5 format=3 uid="uid://d0xarx881qp0"]
 
 [ext_resource type="Script" uid="uid://dthp3el6slhs8" path="res://Scenes/Deck/Characters/CharacterResource.gd" id="1_liss2"]
+[ext_resource type="Resource" uid="uid://vtdqd82wg2gt" path="res://Scenes/Deck/Cards/PointyStick.tres" id="2_880nm"]
+[ext_resource type="Resource" uid="uid://d3dok1xoj3qwr" path="res://Scenes/Deck/Cards/Deathcap.tres" id="3_k8oav"]
+[ext_resource type="Resource" uid="uid://cmhlhmwa1rwbe" path="res://Scenes/Deck/Cards/Firebloom.tres" id="4_jfyi8"]
 
 [resource]
 script = ExtResource("1_liss2")
 character_name = "Test"
 starting_deck = {
-"Deathcap": 5,
-"Firebloom": 5
+ExtResource("2_880nm"): 3,
+ExtResource("3_k8oav"): 7,
+ExtResource("4_jfyi8"): 7
 }
 starting_health = 100
 current_health = 100
+burn = 0
+poison = 0
+burn_strength = 1
 metadata/_custom_type_script = "uid://dthp3el6slhs8"

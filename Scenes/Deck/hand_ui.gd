@@ -22,13 +22,11 @@ func add_card_to_hand(card: CardResource):
 		card_ui.setup(card)
 		card_ui.connect("card_clicked", Callable(self, "_on_card_clicked").bind(card))
 		add_child(card_ui)
-	else:
-		print("Hand is full! Cannot add more cards.")
 	# Optionally, you can implement a logic to discard the oldest card if the hand is full
+
 func _on_card_clicked(card_resource):
-	var tray = get_node(tray_ui_path) # Set this NodePath in the editor
+	var tray = get_node(tray_ui_path)
 	if tray.add_card_to_tray(card_resource):
 		var deck = get_tree().get_root().get_node("Gamemanager").deck
 		deck.hand.erase(card_resource)
 		update_hand(deck.hand)
-		print("Card added to tray:", card_resource.card_name)
