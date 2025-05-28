@@ -15,6 +15,7 @@ ExtResource("4_jfyi8"): 7
 }
 starting_health = 100
 current_health = 100
+aromor = 0
 burn = 0
 poison = 0
 burn_strength = 1

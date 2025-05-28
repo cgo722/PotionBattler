@@ -1,10 +1,9 @@
-[gd_scene load_steps=14 format=3 uid="uid://bvhifu0m7tekn"]
+[gd_scene load_steps=13 format=3 uid="uid://bvhifu0m7tekn"]
 
 [ext_resource type="Script" uid="uid://jk31iindsom8" path="res://Gamemanager.gd" id="1_x4av3"]
 [ext_resource type="Resource" uid="uid://vvreu3hmla6g" path="res://Scenes/events/battle1.tres" id="2_8xkvn"]
 [ext_resource type="Script" uid="uid://c6b8lhbdwp54s" path="res://Scenes/Deck/Deck.gd" id="2_rpqi1"]
 [ext_resource type="Resource" uid="uid://d0xarx881qp0" path="res://Scenes/Deck/Characters/Test.tres" id="2_uxrcv"]
-[ext_resource type="Script" uid="uid://dcdicy44ariy8" path="res://Scenes/events/eventResource.gd" id="2_yvb8b"]
 [ext_resource type="Resource" uid="uid://btqeuocl8vrmk" path="res://Scenes/events/ shop.tres" id="3_p5x2j"]
 [ext_resource type="PackedScene" uid="uid://dgvw1d7m831c1" path="res://Scenes/Deck/HandUI.tscn" id="3_rpqi1"]
 [ext_resource type="Resource" uid="uid://cg5c1o1alaif4" path="res://Scenes/events/random Ingredient.tres" id="4_p5x2j"]
@@ -16,7 +15,7 @@
 
 [node name="Gamemanager" type="Node"]
 script = ExtResource("1_x4av3")
-possible_events = Array[ExtResource("2_yvb8b")]([ExtResource("2_8xkvn"), ExtResource("3_p5x2j"), ExtResource("4_p5x2j")])
+possible_events = [ExtResource("2_8xkvn"), ExtResource("3_p5x2j"), ExtResource("4_p5x2j")]
 potion_combiner = NodePath("PotionCombiner")
 character_resource = ExtResource("2_uxrcv")
 enemies = Array[Resource]([ExtResource("7_3hf6u")])

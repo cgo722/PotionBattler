@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CardResource" load_steps=2 format=3 uid="uid://bdu6ywoue7q8m"]
+
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="1_srwpx"]
+
+[resource]
+script = ExtResource("1_srwpx")
+card_name = "Bark SHard"
+description = ""
+rarity = "Common"
+tags = Array[String](["Armor"])
+card_text = ""
+effects = Array[Resource]([])
+metadata/_custom_type_script = "uid://428fppsn728g"

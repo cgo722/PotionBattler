@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardEffect" load_steps=2 format=3 uid="uid://hq371b4ikrjo"]
+
+[ext_resource type="Script" uid="uid://dw2r35itfuvt1" path="res://Scenes/Deck/Cards/Card Effects/CardEffect.gd" id="1_ke758"]
+
+[resource]
+script = ExtResource("1_ke758")
+effect_type = "burn"
+value = 3
+metadata/_custom_type_script = "uid://dw2r35itfuvt1"

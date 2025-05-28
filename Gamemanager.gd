@@ -140,13 +140,22 @@ func end_run():
 func _on_ingredients_selected(ingredients: Array):
 	var combiner_node = get_node(potion_combiner)
 	var result = combiner_node.combine_ingredients(ingredients)
-	if result.has("damage"):
-		enemy.current_health -= result.damage
-	if result.has("burn"):
-		enemy.burn += result.burn
-	if result.has("poison"):
-		enemy.poison += result.poison
-	print("Enemy health after potion:", enemy.current_health) # Debug print
+
+	if result is Array:
+		for effect in result:
+			match effect.effect_type:
+				"damage":
+					enemy.current_health -= effect.value
+				"burn":
+					enemy.burn += effect.value
+				"poison":
+					enemy.poison += effect.value
+				_:
+					print("Unknown effect type from potion:", effect.effect_type)
+	else:
+		print("Invalid potion result:", result)
+
+	print("Enemy health after potion:", enemy.current_health)
 	enemy_turn()
 
 func get_possible_events() -> Array:

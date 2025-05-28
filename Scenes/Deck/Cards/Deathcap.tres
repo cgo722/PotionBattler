@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="CardResource" load_steps=2 format=3 uid="uid://d3dok1xoj3qwr"]
+[gd_resource type="Resource" script_class="CardResource" load_steps=3 format=3 uid="uid://d3dok1xoj3qwr"]
 
-[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards.gd" id="1_its8r"]
+[ext_resource type="Resource" uid="uid://bbvnwbqpmkn8k" path="res://Scenes/Deck/Cards/Card Effects/Poison_3.tres" id="1_hxkqn"]
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="2_5bge4"]
 
 [resource]
-script = ExtResource("1_its8r")
+script = ExtResource("2_5bge4")
 card_name = "Deathcap"
 description = ""
 rarity = "Common"
 tags = Array[String](["Poison"])
-effectID = 1003
-effect_efficency = 5
 card_text = ""
+effects = Array[Resource]([ExtResource("1_hxkqn")])
 metadata/_custom_type_script = "uid://428fppsn728g"

@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="CardResource" load_steps=2 format=3 uid="uid://cmhlhmwa1rwbe"]
+[gd_resource type="Resource" script_class="CardResource" load_steps=3 format=3 uid="uid://cmhlhmwa1rwbe"]
 
-[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards.gd" id="1_m8h7q"]
+[ext_resource type="Resource" uid="uid://hq371b4ikrjo" path="res://Scenes/Deck/Cards/Card Effects/Burn_3.tres" id="1_hlsdm"]
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="2_7n12v"]
 
 [resource]
-script = ExtResource("1_m8h7q")
+script = ExtResource("2_7n12v")
 card_name = "Firebloom"
 description = ""
 rarity = "Common"
 tags = Array[String](["Burn"])
-effectID = 1000
-effect_efficency = 5
 card_text = ""
+effects = Array[Resource]([ExtResource("1_hlsdm")])
 metadata/_custom_type_script = "uid://428fppsn728g"

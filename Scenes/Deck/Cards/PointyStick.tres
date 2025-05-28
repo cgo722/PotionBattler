@@ -1,14 +1,14 @@
-[gd_resource type="Resource" script_class="CardResource" load_steps=2 format=3 uid="uid://vtdqd82wg2gt"]
+[gd_resource type="Resource" script_class="CardResource" load_steps=3 format=3 uid="uid://vtdqd82wg2gt"]
 
-[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards.gd" id="1_gfsne"]
+[ext_resource type="Resource" uid="uid://7l7hsd4sfj2j" path="res://Scenes/Deck/Cards/Card Effects/Damage_15.tres" id="1_52ns7"]
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="2_k1nsf"]
 
 [resource]
-script = ExtResource("1_gfsne")
+script = ExtResource("2_k1nsf")
 card_name = "Pointy Stick"
 description = ""
 rarity = "Common"
 tags = Array[String](["damage"])
-effectID = 1001
-effect_efficency = 15
 card_text = ""
+effects = Array[Resource]([ExtResource("1_52ns7")])
 metadata/_custom_type_script = "uid://428fppsn728g"

@@ -5,7 +5,7 @@ var special_recipes = {
 	["Mandrake", "Nightshade", "Moonwater"]: {"effect": "Invisibility", "value": 50}
 }
 
-func combine_ingredients(ingredients: Array) -> Dictionary:
+func combine_ingredients(ingredients: Array) -> Array:
 	var tag_totals := {}
 	var tag_counts := {}
 	var ingredient_names := []
@@ -13,9 +13,13 @@ func combine_ingredients(ingredients: Array) -> Dictionary:
 	for ingredient in ingredients:
 		ingredient_names.append(ingredient.card_name)
 		for tag in ingredient.tags:
-			var effect_val = ingredient.effect_efficency
-			tag_totals[tag] = tag_totals.get(tag, 0) + effect_val
-			tag_counts[tag] = tag_counts.get(tag, 0) + 1
+			var tag_value := 0
+			for effect in ingredient.effects:
+				if effect.effect_type == tag:
+					tag_value += effect.value
+			if tag_value > 0:
+				tag_totals[tag] = tag_totals.get(tag, 0) + tag_value
+				tag_counts[tag] = tag_counts.get(tag, 0) + 1
 	
 	# Multiply effects for tags with multiple ingredients
 	for tag in tag_totals.keys():
@@ -25,19 +29,38 @@ func combine_ingredients(ingredients: Array) -> Dictionary:
 	# Check for special recipes (exact order)
 	for recipe in special_recipes.keys():
 		if ingredient_names == recipe:
-			return special_recipes[recipe]
-	
-	return tag_totals
+			var special_effect := CardEffect.new()
+			special_effect.effect_type = special_recipes[recipe]["effect"]
+			special_effect.value = special_recipes[recipe]["value"]
+			return [special_effect]
+
+	var final_effects: Array = []
+	for tag in tag_totals.keys():
+		var effect := CardEffect.new()
+		effect.effect_type = tag
+		effect.value = tag_totals[tag]
+		final_effects.append(effect)
+
+	return final_effects
 
 func apply_card_effect(card: CardResource, target: Node):
-	match card.effectID:
-		1000: target.apply_burn(card.effect_efficency)
-		1001: target.take_damage(card.effect_efficency)
-		1002: target.heal(card.effect_efficency)
-		1003: target.apply_poison(card.effect_efficency)
-		1004: target.add_armor(card.effect_efficency)
-		1005: target.apply_chaos(card.effect_efficency)
-		1006: target.draw_cards(card.effect_efficency)
-		1007: target.discard_cards(card.effect_efficency)
-		_:
-			print("Unknown effectID: %s" % card.effectID)
+	for effect in card.effects:
+		match effect.effect_type:
+			"burn":
+				target.apply_burn(effect.value)
+			"damage":
+				target.take_damage(effect.value)
+			"heal":
+				target.heal(effect.value)
+			"poison":
+				target.apply_poison(effect.value)
+			"armor":
+				target.add_armor(effect.value)
+			"chaos":
+				target.apply_chaos(effect.value)
+			"draw":
+				target.draw_cards(effect.value)
+			"discard":
+				target.discard_cards(effect.value)
+			_:
+				print("Unknown effect type: %s" % effect.effect_type)
