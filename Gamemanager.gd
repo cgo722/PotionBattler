@@ -25,6 +25,8 @@ var shop_inventory = []
 var enemy
 var last_turn_was_player := false
 
+#region Initialization and Run Management
+
 func _ready():
 	deck = get_node(deck_node_path)
 	deck.connect("hand_changed", Callable(hand_ui, "update_hand"))
@@ -52,6 +54,10 @@ func start_run():
 	hand_ui.update_hand(deck.hand)
 	next_phase()
 
+# endregion
+
+# region Game State and Phase Management
+
 func next_phase():
 	match state:
 		GameState.RUNNING:
@@ -72,18 +78,16 @@ func next_phase():
 			update_ui_visibility()
 			process_end_of_turn_effects()
 		GameState.BATTLE_END_OF_TURN:
-			if state == GameState.BATTLE_END_OF_TURN:
-				if last_turn_was_player:
-					state = GameState.BATTLE_ENEMY_TURN
-					update_ui_visibility()
-					enemy_turn()
-				else:
-					state = GameState.BATTLE_DRAW_PHASE
-					update_ui_visibility()
-					draw_phase()
+			if last_turn_was_player:
+				state = GameState.BATTLE_ENEMY_TURN
+				update_ui_visibility()
+				enemy_turn()
+			else:
+				state = GameState.BATTLE_DRAW_PHASE
+				update_ui_visibility()
+				draw_phase()
 		GameState.END_RUN:
 			show_menu()
-
 
 func choose_event():
 	pass
@@ -119,14 +123,13 @@ func draw_phase():
 
 func player_turn():
 	last_turn_was_player = true
-	process_burn(character_resource)
+	apply_burn_damage(character_resource)
 	deck.draw_hand()
 	hand_ui.update_hand(deck.hand)
 
 func enemy_turn():
 	last_turn_was_player = false
-	process_burn(enemy)
-	process_poison(enemy)
+	apply_burn_damage(enemy)
 	if character_resource.current_health <= 0:
 		state = GameState.END_RUN
 		update_ui_visibility()
@@ -136,6 +139,10 @@ func enemy_turn():
 
 func end_run():
 	pass
+
+# endregion
+
+# region Potion and Event Handling
 
 func _on_ingredients_selected(ingredients: Array):
 	var combiner_node = get_node(potion_combiner)
@@ -155,11 +162,59 @@ func _on_ingredients_selected(ingredients: Array):
 	else:
 		print("Invalid potion result:", result)
 
-	print("Enemy health after potion:", enemy.current_health)
-	enemy_turn()
+	next_phase()
 
 func get_possible_events() -> Array:
 	return possible_events.duplicate()
+
+func handle_event(event_data):
+	if event_data.type == "shop":
+		state = GameState.SHOPPING
+	elif event_data.type == "battle":
+		state = GameState.BATTLE_DRAW_PHASE
+	else:
+		state = GameState.RUNNING
+	update_ui_visibility()
+	next_phase()
+
+func _on_enemy_chosen(enemy_resource):
+	start_battle(enemy_resource)
+
+# endregion
+
+# region Status Effects Processing
+
+func apply_burn_damage(target):
+	if target.burn > 0:
+		target.current_health -= target.burn
+		target.burn = max(target.burn - target.burn_strength, 0)
+
+func apply_poison_damage(target):
+	if target.poison > 0:
+		target.current_health -= target.poison
+
+func process_end_of_turn_effects():
+	if last_turn_was_player:
+		apply_burn_damage(enemy)
+		apply_poison_damage(enemy)
+	else:
+		apply_burn_damage(character_resource)
+		apply_poison_damage(character_resource)
+
+	# Add a small buffer delay
+	var delay_timer := Timer.new()
+	delay_timer.one_shot = true
+	delay_timer.wait_time = 1.0
+	add_child(delay_timer)
+	delay_timer.start()
+	await delay_timer.timeout
+	delay_timer.queue_free()
+
+	next_phase()
+
+# endregion
+
+# region UI Management
 
 func update_ui_visibility():
 	var menu_ui = $MainMenu if has_node("MainMenu") else null
@@ -213,46 +268,4 @@ func update_ui_visibility():
 			if event_ui: event_ui.visible = false
 			if situation_picker: situation_picker.visible = false
 
-func handle_event(event_data):
-	if event_data.type == "shop":
-		state = GameState.SHOPPING
-	elif event_data.type == "battle":
-		state = GameState.BATTLE_DRAW_PHASE
-	else:
-		state = GameState.RUNNING
-	update_ui_visibility()
-	next_phase()
-
-func _on_enemy_chosen(enemy_resource):
-	start_battle(enemy_resource)
-
-func process_burn(target):
-	if target.burn > 0:
-		target.current_health -= target.burn
-		target.burn = max(target.burn - target.burn_strength, 0)
-
-func process_poison(target):
-	if target.poison > 0:
-		target.current_health -= target.poison
-
-func process_end_of_turn_effects():
-	if last_turn_was_player:
-		process_burn(character_resource)
-		process_poison(character_resource)
-	else:
-		process_burn(enemy)
-		process_poison(enemy)
-
-	print("Enemy health:", enemy.current_health, "Burn:", enemy.burn, "Poison:", enemy.poison)
-	print("Player health:", character_resource.current_health, "Burn:", character_resource.burn, "Poison:", character_resource.poison)
-
-	# Add a small buffer delay
-	var delay_timer := Timer.new()
-	delay_timer.one_shot = true
-	delay_timer.wait_time = 1.0
-	add_child(delay_timer)
-	delay_timer.start()
-	await delay_timer.timeout
-	delay_timer.queue_free()
-
-	next_phase()
+# endregion
