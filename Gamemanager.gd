@@ -5,9 +5,7 @@ enum GameState {
 	RUNNING,
 	CHOOSE_EVENT,
 	SHOPPING,
-	BATTLE_DRAW_PHASE,
 	BATTLE_PLAYER_TURN,
-	BATTLE_END_OF_TURN,
 	BATTLE_ENEMY_TURN,
 	END_RUN
 }
@@ -19,6 +17,11 @@ var deck: Deck
 var state: GameState = GameState.MENU
 @onready var hand_ui = $HandUi
 @onready var tray_ui = $TrayUi
+@onready var menu_ui = $MainMenu if has_node("MainMenu") else null
+@onready var shop_ui = $ShopUi if has_node("ShopUi") else null
+@onready var event_ui = $EventUi if has_node("EventUi") else null
+@onready var situation_picker = $Situationpicker if has_node("Situationpicker") else null
+
 @export var character_resource: Resource
 @export var enemies: Array[Resource] = []
 var shop_inventory = []
@@ -32,8 +35,8 @@ func _ready():
 	deck.connect("hand_changed", Callable(hand_ui, "update_hand"))
 	show_menu()
 	tray_ui.connect("ingredients_selected", Callable(self, "_on_ingredients_selected"))
-	if has_node("Situationpicker"):
-		$Situationpicker.connect("enemy_chosen", Callable(self, "_on_enemy_chosen"))
+	if situation_picker:
+		situation_picker.connect("enemy_chosen", Callable(self, "_on_enemy_chosen"))
 
 func show_menu():
 	state = GameState.MENU
@@ -69,23 +72,10 @@ func next_phase():
 		GameState.SHOPPING:
 			state = GameState.RUNNING
 			update_ui_visibility()
-		GameState.BATTLE_DRAW_PHASE:
-			state = GameState.BATTLE_PLAYER_TURN
-			update_ui_visibility()
-			player_turn()
-		GameState.BATTLE_PLAYER_TURN, GameState.BATTLE_ENEMY_TURN:
-			state = GameState.BATTLE_END_OF_TURN
-			update_ui_visibility()
-			process_end_of_turn_effects()
-		GameState.BATTLE_END_OF_TURN:
-			if last_turn_was_player:
-				state = GameState.BATTLE_ENEMY_TURN
-				update_ui_visibility()
-				enemy_turn()
-			else:
-				state = GameState.BATTLE_DRAW_PHASE
-				update_ui_visibility()
-				draw_phase()
+		GameState.BATTLE_PLAYER_TURN:
+			end_turn()
+		GameState.BATTLE_ENEMY_TURN:
+			end_turn()
 		GameState.END_RUN:
 			show_menu()
 
@@ -113,9 +103,9 @@ func buy_card(card):
 func start_battle(enemy_resource):
 	if enemy_resource:
 		enemy = enemy_resource.duplicate(true)
-	state = GameState.BATTLE_DRAW_PHASE
+	state = GameState.BATTLE_PLAYER_TURN
 	update_ui_visibility()
-	draw_phase()
+	player_turn()
 
 func draw_phase():
 	deck.draw_hand()
@@ -124,21 +114,47 @@ func draw_phase():
 func player_turn():
 	last_turn_was_player = true
 	apply_burn_damage(character_resource)
+	apply_poison_damage(character_resource)
+	if character_resource.current_health <= 0:
+		state = GameState.END_RUN
+		update_ui_visibility()
+		end_run()
+		return
 	deck.draw_hand()
 	hand_ui.update_hand(deck.hand)
 
 func enemy_turn():
 	last_turn_was_player = false
 	apply_burn_damage(enemy)
+	apply_poison_damage(enemy)
+	if enemy.current_health <= 0:
+		state = GameState.RUNNING # Or some victory state
+		update_ui_visibility()
+		# TODO: Add rewards, etc.
+		end_run()
+		return
+
+	# Simple enemy AI: attack for 5 damage
+	character_resource.current_health -= 5
+	print("Enemy attacks for 5 damage!")
+
 	if character_resource.current_health <= 0:
 		state = GameState.END_RUN
 		update_ui_visibility()
 		end_run()
 		return
-	next_phase()
+	
+	state = GameState.BATTLE_PLAYER_TURN
+	update_ui_visibility()
+	player_turn()
 
 func end_run():
-	pass
+	if character_resource.current_health <= 0:
+		print("You lose!")
+	else:
+		print("You win!")
+	# For now, just go back to the menu
+	show_menu()
 
 # endregion
 
@@ -150,19 +166,27 @@ func _on_ingredients_selected(ingredients: Array):
 
 	if result is Array:
 		for effect in result:
+			var target = enemy
+			if effect.target == "player":
+				target = character_resource
+
 			match effect.effect_type:
 				"damage":
-					enemy.current_health -= effect.value
+					target.current_health -= effect.value
 				"burn":
-					enemy.burn += effect.value
+					target.burn += effect.value
 				"poison":
-					enemy.poison += effect.value
+					target.poison += effect.value
+				"heal":
+					target.current_health += effect.value
+				"armor":
+					target.aromor += effect.value
 				_:
 					print("Unknown effect type from potion:", effect.effect_type)
 	else:
 		print("Invalid potion result:", result)
 
-	next_phase()
+	end_turn()
 
 func get_possible_events() -> Array:
 	return possible_events.duplicate()
@@ -171,7 +195,7 @@ func handle_event(event_data):
 	if event_data.type == "shop":
 		state = GameState.SHOPPING
 	elif event_data.type == "battle":
-		state = GameState.BATTLE_DRAW_PHASE
+		start_battle(event_data.enemy)
 	else:
 		state = GameState.RUNNING
 	update_ui_visibility()
@@ -193,77 +217,61 @@ func apply_poison_damage(target):
 	if target.poison > 0:
 		target.current_health -= target.poison
 
-func process_end_of_turn_effects():
+func end_turn():
 	if last_turn_was_player:
-		apply_burn_damage(enemy)
-		apply_poison_damage(enemy)
+		state = GameState.BATTLE_ENEMY_TURN
+		update_ui_visibility()
+		enemy_turn()
 	else:
-		apply_burn_damage(character_resource)
-		apply_poison_damage(character_resource)
-
-	# Add a small buffer delay
-	var delay_timer := Timer.new()
-	delay_timer.one_shot = true
-	delay_timer.wait_time = 1.0
-	add_child(delay_timer)
-	delay_timer.start()
-	await delay_timer.timeout
-	delay_timer.queue_free()
-
-	next_phase()
+		state = GameState.BATTLE_PLAYER_TURN
+		update_ui_visibility()
+		player_turn()
 
 # endregion
 
 # region UI Management
 
 func update_ui_visibility():
-	var menu_ui = $MainMenu if has_node("MainMenu") else null
-	var hand_ui_node = $HandUi if has_node("HandUi") else null
-	var tray_ui_node = $TrayUi if has_node("TrayUi") else null
-	var shop_ui = $ShopUi if has_node("ShopUi") else null
-	var event_ui = $EventUi if has_node("EventUi") else null
-	var situation_picker = $Situationpicker if has_node("Situationpicker") else null
-
 	match state:
 		GameState.MENU:
 			if menu_ui: menu_ui.visible = true
-			if hand_ui_node: hand_ui_node.visible = false
-			if tray_ui_node: tray_ui_node.visible = false
+			if hand_ui: hand_ui.visible = false
+			if tray_ui: tray_ui.visible = false
 			if shop_ui: shop_ui.visible = false
 			if event_ui: event_ui.visible = false
 			if situation_picker: situation_picker.visible = false
 		GameState.RUNNING:
 			if menu_ui: menu_ui.visible = false
-			if hand_ui_node: hand_ui_node.visible = false
-			if tray_ui_node: tray_ui_node.visible = false
+			if hand_ui: hand_ui.visible = false
+			if tray_ui: tray_ui.visible = false
 			if shop_ui: shop_ui.visible = false
 			if event_ui: event_ui.visible = false
 			if situation_picker: situation_picker.visible = false
 		GameState.CHOOSE_EVENT:
 			if menu_ui: menu_ui.visible = false
-			if hand_ui_node: hand_ui_node.visible = false
-			if tray_ui_node: tray_ui_node.visible = false
+			if hand_ui: hand_ui.visible = false
+			if tray_ui: tray_ui.visible = false
 			if shop_ui: shop_ui.visible = false
 			if event_ui: event_ui.visible = true
 			if situation_picker: situation_picker.visible = true
 		GameState.SHOPPING:
 			if menu_ui: menu_ui.visible = false
-			if hand_ui_node: hand_ui_node.visible = false
-			if tray_ui_node: tray_ui_node.visible = false
+			if hand_ui: hand_ui.visible = false
+			if tray_ui: tray_ui.visible = false
 			if shop_ui: shop_ui.visible = true
 			if event_ui: event_ui.visible = false
 			if situation_picker: situation_picker.visible = false
-		GameState.BATTLE_DRAW_PHASE, GameState.BATTLE_PLAYER_TURN, GameState.BATTLE_ENEMY_TURN:
+		GameState.BATTLE_PLAYER_TURN, GameState.BATTLE_ENEMY_TURN:
 			if menu_ui: menu_ui.visible = false
-			if hand_ui_node: hand_ui_node.visible = true
-			if tray_ui_node: tray_ui_node.visible = true
+			if hand_ui: hand_ui.visible = true
+			if tray_ui: tray_ui.visible = true
 			if shop_ui: shop_ui.visible = false
 			if event_ui: event_ui.visible = false
 			if situation_picker: situation_picker.visible = false
 		GameState.END_RUN:
 			if menu_ui: menu_ui.visible = false
-			if hand_ui_node: hand_ui_node.visible = false
-			if tray_ui_node: tray_ui_node.visible = false
+			if hand_ui: hand_ui.visible = false
+			if tray_ui: tray_ui.visible = false
 			if shop_ui: shop_ui.visible = false
 			if event_ui: event_ui.visible = false
 			if situation_picker: situation_picker.visible = false
