@@ -1,11 +1,14 @@
-[gd_resource type="Resource" script_class="CharacterResource" load_steps=2 format=3 uid="uid://toxr1pmpyxr4"]
+[gd_resource type="Resource" script_class="CharacterResource" load_steps=4 format=3 uid="uid://toxr1pmpyxr4"]
 
 [ext_resource type="Script" uid="uid://dthp3el6slhs8" path="res://Scenes/Deck/Characters/CharacterResource.gd" id="1_xlvxs"]
+[ext_resource type="Resource" uid="uid://bdu6ywoue7q8m" path="res://Scenes/Deck/Cards/Barkshard.tres" id="2_v1trv"]
+[ext_resource type="Resource" uid="uid://vtdqd82wg2gt" path="res://Scenes/Deck/Cards/PointyStick.tres" id="3_76w00"]
 
 [resource]
 script = ExtResource("1_xlvxs")
-character_name = ""
-starting_deck = {}
-starting_health = 100
-current_health = 100
+name = "Shroomit"
+starting_deck = {
+ExtResource("2_v1trv"): 4,
+ExtResource("3_76w00"): 4
+}
 metadata/_custom_type_script = "uid://dthp3el6slhs8"

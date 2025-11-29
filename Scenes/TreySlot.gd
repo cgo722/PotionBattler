@@ -2,12 +2,6 @@ extends Button
 
 var card: CardResource = null
 
-func _can_drop_data(_pos, data):
-    return typeof(data) == TYPE_OBJECT and data is CardResource
-
-func _drop_data(_pos, data):
-    set_card(data)
-
 func set_card(card_resource: CardResource):
     card = card_resource
     set_meta("card", card)

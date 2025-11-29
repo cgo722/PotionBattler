@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CardEffect" load_steps=2 format=3 uid="uid://bsrfq7e4r6yon"]
+
+[ext_resource type="Script" uid="uid://dw2r35itfuvt1" path="res://Scenes/Deck/Cards/Card Effects/CardEffect.gd" id="1_oohgr"]
+
+[resource]
+script = ExtResource("1_oohgr")
+effect_type = "armor"
+value = 7
+metadata/_custom_type_script = "uid://dw2r35itfuvt1"

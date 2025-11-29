@@ -1,9 +1,9 @@
-[gd_resource type="Resource" script_class="CardEffect" load_steps=2 format=3 uid="uid://7l7hsd4sfj2j"]
+[gd_resource type="Resource" script_class="CardEffect" load_steps=2 format=3 uid="uid://jll43bkwn1jd"]
 
 [ext_resource type="Script" uid="uid://dw2r35itfuvt1" path="res://Scenes/Deck/Cards/Card Effects/CardEffect.gd" id="1_lixsb"]
 
 [resource]
 script = ExtResource("1_lixsb")
 effect_type = "damage"
-value = 15
+value = 5
 metadata/_custom_type_script = "uid://dw2r35itfuvt1"

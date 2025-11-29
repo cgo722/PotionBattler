@@ -1,12 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://bgv20rd725a28"]
+[gd_scene load_steps=3 format=3 uid="uid://bgv20rd725a28"]
 
 [ext_resource type="Script" uid="uid://benk8nabuamcl" path="res://Scenes/Deck/card_ui.gd" id="1_fasgi"]
+
+[sub_resource type="Curve" id="Curve_fasgi"]
+_data = [Vector2(0, 0), 0.0, 2.1279433, 0, 0, Vector2(1, 1), 0.094887964, 0.0, 0, 0]
+point_count = 2
 
 [node name="CardUi" type="Panel"]
 custom_minimum_size = Vector2(120, 180)
 offset_right = 120.0
 offset_bottom = 180.0
 script = ExtResource("1_fasgi")
+animation_curve = SubResource("Curve_fasgi")
 
 [node name="CardNameLabel" type="Label" parent="."]
 layout_mode = 1

@@ -1,13 +1,12 @@
-[gd_resource type="Resource" script_class="CardResource" load_steps=2 format=3 uid="uid://bdu6ywoue7q8m"]
+[gd_resource type="Resource" script_class="CardResource" load_steps=3 format=3 uid="uid://bdu6ywoue7q8m"]
 
+[ext_resource type="Resource" uid="uid://bsrfq7e4r6yon" path="res://Scenes/Deck/Cards/Card Effects/Armor_7.tres" id="1_r5mwq"]
 [ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="1_srwpx"]
 
 [resource]
 script = ExtResource("1_srwpx")
-card_name = "Bark SHard"
-description = ""
+card_name = "Bark Shard"
 rarity = "Common"
 tags = Array[String](["Armor"])
-card_text = ""
-effects = Array[Resource]([])
+effects = Array[Resource]([ExtResource("1_r5mwq")])
 metadata/_custom_type_script = "uid://428fppsn728g"

@@ -1,57 +1,45 @@
 extends HBoxContainer
 
-@export var hand_ui_path: NodePath # Set this to your HandUi node in the editor
+# This UI component is now purely visual. The GameManager will manage the state.
+
+signal slot_clicked(slot_index)
+
 var slots: Array = []
-signal ingredients_selected(ingredients: Array)
 
 func _ready():
-    slots = [get_node("Slot0"), get_node("Slot1"), get_node("Slot2")]
-    for slot in slots:
-        slot.connect("pressed", Callable(self, "_on_slot_pressed").bind(slot))
-    get_node("VBoxContainer/CombineButton").connect("pressed", Callable(self, "on_combine_pressed"))
+	slots = [get_node("Slot0"), get_node("Slot1"), get_node("Slot2")]
+	for i in range(slots.size()):
+		slots[i].connect("pressed", Callable(self, "_on_slot_pressed").bind(i))
+	# The GameManager will now handle the combine button press.
 
-func add_card_to_tray(card: CardResource) -> bool:
-    for slot in slots:
-        if not slot.has_meta("card") or slot.get_meta("card") == null:
-            slot.set_meta("card", card)
-            slot.modulate = Color(1, 1, 1)
-            for child in slot.get_children():
-                child.queue_free()
-            var label = Label.new()
-            label.text = card.card_name
-            slot.add_child(label)
-            return true
-    return false
+func _on_slot_pressed(slot_index: int):
+	emit_signal("slot_clicked", slot_index)
+func update_display(cards_in_tray: Array):
+	"""
+	Updates the visual display of the tray based on the cards provided.
+	"""
+	for i in range(slots.size()):
+		var slot = slots[i]
+		# Clear previous content from the slot
+		for child in slot.get_children():
+			child.queue_free()
+		
+		if i < cards_in_tray.size():
+			# If there is a card for this slot, display it.
+			var label = Label.new()
+			label.text = cards_in_tray[i].card_name
+			slot.add_child(label)
+			slot.modulate = Color(1, 1, 1) # Make it look active
+		else:
+			# Otherwise, make it look empty.
+			slot.modulate = Color(0.5, 0.5, 0.5)
 
-func _on_slot_pressed(slot):
-    var card = slot.get_meta("card")
-    if card:
-        var hand_ui = get_node(hand_ui_path)
-        var deck = get_tree().get_root().get_node("Gamemanager").deck
-        if card not in deck.hand:
-            deck.hand.append(card)
-            hand_ui.update_hand(deck.hand)
-        slot.set_meta("card", null)
-        for child in slot.get_children():
-            child.queue_free()
-        slot.modulate = Color(0.5, 0.5, 0.5)
-
-func clear_tray():
-    for slot in slots:
-        slot.set_meta("card", null)
-        for child in slot.get_children():
-            child.queue_free()
-        slot.modulate = Color(0.5, 0.5, 0.5)
-
-func on_combine_pressed():
-    var ingredients: Array = []
-    var deck = get_tree().get_root().get_node("Gamemanager").deck
-    for slot in slots:
-        var card = slot.get_meta("card")
-        if card:
-            ingredients.append(card)
-            deck.discard_card(card)
-    if ingredients.size() > 2:
-        emit_signal("ingredients_selected", ingredients)
-        clear_tray()
-
+func get_next_empty_slot_global_position(cards_in_tray_count: int):
+	"""
+	Returns the global position of the center of the next empty slot.
+	Returns null if the tray is full.
+	"""
+	if cards_in_tray_count < slots.size():
+		var next_slot = slots[cards_in_tray_count]
+		return next_slot.global_position + next_slot.size / 2
+	return null

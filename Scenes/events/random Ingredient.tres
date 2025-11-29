@@ -1,10 +1,9 @@
-[gd_resource type="Resource" script_class="Event" load_steps=2 format=3 uid="uid://cg5c1o1alaif4"]
+[gd_resource type="Resource" script_class="AddCardEvent" load_steps=2 format=3 uid="uid://cg5c1o1alaif4"]
 
-[ext_resource type="Script" uid="uid://dcdicy44ariy8" path="res://Scenes/events/eventResource.gd" id="1_m63nh"]
+[ext_resource type="Script" uid="uid://cpsie88scw0s7" path="res://Scenes/events/AddCardEvent.gd" id="1_m63nh"]
 
 [resource]
 script = ExtResource("1_m63nh")
 name = "find plant"
 type = "random"
-description = ""
 metadata/_custom_type_script = "uid://dcdicy44ariy8"
