@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_lixsb")
-effect_type = "damage"
+effect_type = "heal"
 value = 5
 metadata/_custom_type_script = "uid://dw2r35itfuvt1"

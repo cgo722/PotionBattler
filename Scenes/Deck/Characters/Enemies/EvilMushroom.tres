@@ -2,13 +2,13 @@
 
 [ext_resource type="Script" uid="uid://dthp3el6slhs8" path="res://Scenes/Deck/Characters/CharacterResource.gd" id="1_xlvxs"]
 [ext_resource type="Resource" uid="uid://bdu6ywoue7q8m" path="res://Scenes/Deck/Cards/Barkshard.tres" id="2_v1trv"]
-[ext_resource type="Resource" uid="uid://vtdqd82wg2gt" path="res://Scenes/Deck/Cards/PointyStick.tres" id="3_76w00"]
+[ext_resource type="Resource" uid="uid://cmhlhmwa1rwbe" path="res://Scenes/Deck/Cards/Salt.tres" id="3_v1trv"]
 
 [resource]
 script = ExtResource("1_xlvxs")
 name = "Shroomit"
 starting_deck = {
 ExtResource("2_v1trv"): 4,
-ExtResource("3_76w00"): 4
+ExtResource("3_v1trv"): 4
 }
 metadata/_custom_type_script = "uid://dthp3el6slhs8"

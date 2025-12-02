@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_ke758")
-effect_type = "burn"
+effect_type = "ward"
 value = 3
 metadata/_custom_type_script = "uid://dw2r35itfuvt1"

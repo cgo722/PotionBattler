@@ -4,6 +4,6 @@
 
 [resource]
 script = ExtResource("1_4vy5s")
-effect_type = "poison"
+effect_type = "bless"
 value = 3
 metadata/_custom_type_script = "uid://dw2r35itfuvt1"

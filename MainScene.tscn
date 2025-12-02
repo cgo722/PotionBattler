@@ -24,10 +24,8 @@ enemies = Array[Resource]([ExtResource("7_3hf6u")])
 script = ExtResource("2_rpqi1")
 
 [node name="HandUi" parent="." instance=ExtResource("3_rpqi1")]
-tray_ui_path = NodePath("../TrayUi")
 
 [node name="TrayUi" parent="." instance=ExtResource("5_rf2cd")]
-hand_ui_path = NodePath("../HandUi")
 
 [node name="PotionCombiner" type="Node" parent="."]
 script = ExtResource("6_a814b")

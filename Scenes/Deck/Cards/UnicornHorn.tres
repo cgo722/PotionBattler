@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CardResource" load_steps=3 format=3 uid="uid://vtdqd82wg2gt"]
+
+[ext_resource type="Resource" uid="uid://jll43bkwn1jd" path="res://Scenes/Deck/Cards/Card Effects/heal_5.tres" id="1_1fjin"]
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="2_wslqy"]
+
+[resource]
+script = ExtResource("2_wslqy")
+card_name = "Unicorn Horn"
+rarity = "Common"
+tags = Array[String](["damage"])
+effects = Array[Resource]([ExtResource("1_1fjin")])
+metadata/_custom_type_script = "uid://428fppsn728g"

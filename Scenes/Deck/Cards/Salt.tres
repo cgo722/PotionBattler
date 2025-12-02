@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CardResource" load_steps=4 format=3 uid="uid://cmhlhmwa1rwbe"]
+
+[ext_resource type="Script" uid="uid://dw2r35itfuvt1" path="res://Scenes/Deck/Cards/Card Effects/CardEffect.gd" id="1_i0n7m"]
+[ext_resource type="Script" uid="uid://428fppsn728g" path="res://Scenes/Deck/Cards/Cards.gd" id="2_ceus3"]
+
+[sub_resource type="Resource" id="Resource_cefya"]
+script = ExtResource("1_i0n7m")
+effect_type = "ward"
+value = 3
+metadata/_custom_type_script = "uid://dw2r35itfuvt1"
+
+[resource]
+script = ExtResource("2_ceus3")
+card_name = "Salt"
+rarity = "Common"
+effects = Array[Resource]([SubResource("Resource_cefya")])
+metadata/_custom_type_script = "uid://428fppsn728g"

@@ -115,7 +115,7 @@ func buy_card(card):
 func start_battle(enemy_resource):
 	print("\n--- BATTLE START ---")
 	if enemy_resource:
-		enemy = enemy_resource.duplicate(true)
+		enemy = enemy_resource
 		print("Enemy: ", enemy.name)
 
 	tray_cards.clear()
@@ -146,11 +146,11 @@ func draw_phase():
 func player_turn():
 	print("\n--- PLAYER'S TURN ---")
 	last_turn_was_player = true
-	print("Player HP: ", character_resource.current_health, " | Armor: ", character_resource.aromor, " | Burn: ", character_resource.burn, " | Poison: ", character_resource.poison)
-	print("Enemy HP: ", enemy.current_health, " | Armor: ", enemy.aromor, " | Burn: ", enemy.burn, " | Poison: ", enemy.poison)
+	print("Player HP: ", character_resource.current_health, " | Armor: ", character_resource.armor, " | Ward: ", character_resource.ward, " | Bless: ", character_resource.bless)
+	print("Enemy HP: ", enemy.current_health, "/", enemy.target_health, " | Armor: ", enemy.armor, " | Ward: ", enemy.ward, " | Bless: ", enemy.bless)
 
-	apply_burn_damage(character_resource)
-	apply_poison_damage(character_resource)
+	apply_ward_healing(character_resource)
+	apply_bless_healing(character_resource)
 	if character_resource.current_health <= 0:
 		state = GameState.END_RUN
 		update_ui_visibility()
@@ -166,15 +166,22 @@ func player_turn():
 func enemy_turn():
 	print("\n--- ENEMY'S TURN ---")
 	last_turn_was_player = false
-	print("Player HP: ", character_resource.current_health, " | Armor: ", character_resource.aromor, " | Burn: ", character_resource.burn, " | Poison: ", character_resource.poison)
-	print("Enemy HP: ", enemy.current_health, " | Armor: ", enemy.aromor, " | Burn: ", enemy.burn, " | Poison: ", enemy.poison)
+	print("Player HP: ", character_resource.current_health, " | Armor: ", character_resource.armor, " | Ward: ", character_resource.ward, " | Bless: ", character_resource.bless)
+	print("Enemy HP: ", enemy.current_health, "/", enemy.target_health, " | Armor: ", enemy.armor, " | Ward: ", enemy.ward, " | Bless: ", enemy.bless)
 
-	apply_burn_damage(enemy)
-	apply_poison_damage(enemy)
+	apply_ward_healing(enemy)
+	apply_bless_healing(enemy)
 	if enemy.current_health <= 0:
-		state = GameState.RUNNING
+		print("The creature you were protecting has perished. You lose.")
+		state = GameState.END_RUN
 		update_ui_visibility()
+		end_run(false) # Pass false to indicate a loss
+		return
+	elif enemy.current_health >= enemy.target_health:
+		print("The creature has been fully healed! You win the battle!")
+		state = GameState.RUNNING
 		enemy_deck = null # Clean up enemy deck
+		update_ui_visibility()
 		next_phase()
 		return
 
@@ -194,37 +201,35 @@ func enemy_turn():
 			# 2. Combine cards
 			var combiner_node = get_node(potion_combiner)
 			var result = combiner_node.combine_ingredients(enemy_hand)
+			print("Enemy combination result: ", result) # DEBUG: See what the combiner returns
 
 			# 3. Apply effects
 			if result is Array:
 				for effect in result:
 					var target = character_resource # Default target is the player
-					if effect.target == "player": # "player" in the effect resource means self-cast
+					if effect.target == "player": # "player" in the effect resource means self-cast for the enemy
 						target = enemy
+					else: # "enemy" in the effect resource means it targets the player
+						target = character_resource
 					
 					match effect.effect_type:
 						"damage":
-							if target == character_resource:
-								target.current_health -= effect.value
-								print("Enemy deals ", effect.value, " damage!")
-						"burn":
-							if target == character_resource:
-								target.burn += effect.value
-								print("Enemy applies ", effect.value, " burn!")
-						"poison":
-							if target == character_resource:
-								target.poison += effect.value
-								print("Enemy applies ", effect.value, " poison!")
+							target.current_health += effect.value
+							print("Enemy action heals ", target.name, " for ", effect.value)
+						"ward": # Renamed from burn
+							target.ward += effect.value
+							print("Enemy applies ", effect.value, " ward to ", target.name)
+						"bless": # Renamed from poison
+							target.bless += effect.value
+							print("Enemy applies ", effect.value, " bless to ", target.name)
 						"heal":
-							if target == enemy:
-								target.current_health += effect.value
-								print("Enemy heals for ", effect.value)
+							target.current_health -= effect.value
+							print("Enemy action damages ", target.name, " for ", effect.value)
 						"armor":
-							if target == enemy:
-								target.aromor += effect.value
-								print("Enemy gains ", effect.value, " armor")
+							target.armor += effect.value
+							print("Enemy gives ", target.name, " ", effect.value, " armor")
 						_:
-							print("Unknown effect type from enemy potion:", effect.effect_type)
+							print("Unknown effect type from enemy potion: '", effect.effect_type, "'")
 			else:
 				print("Enemy combination failed.")
 
@@ -233,18 +238,24 @@ func enemy_turn():
 				enemy_deck.discard.append(card)
 			enemy_deck.hand.clear()
 
+	# Check win/loss conditions again after enemy actions
+	if enemy.current_health >= enemy.target_health:
+		print("The creature has been fully healed! You win the battle!")
+		state = GameState.RUNNING
+		enemy_deck = null # Clean up enemy deck
+		update_ui_visibility()
+		next_phase()
+		return
+
 	if character_resource.current_health <= 0:
 		state = GameState.END_RUN
 		update_ui_visibility()
 		end_run()
 		return
+	end_turn()
 	
-	state = GameState.BATTLE_PLAYER_TURN
-	update_ui_visibility()
-	player_turn()
-
-func end_run():
-	if character_resource.current_health <= 0:
+func end_run(player_survived: bool = true):
+	if not player_survived or character_resource.current_health <= 0:
 		print("You lose!")
 	else:
 		print("You win!")
@@ -362,15 +373,15 @@ func _combine_and_apply_effects(ingredients: Array):
 			print("Applying effect '", effect.effect_type, "' (value: ", effect.value, ") to ", target_name)
 			match effect.effect_type:
 				"damage":
-					target.current_health -= effect.value
-				"burn":
-					target.burn += effect.value
-				"poison":
-					target.poison += effect.value
+					target.current_health += effect.value # Reversed: damage now heals the enemy
+				"ward": # Renamed from burn
+					target.ward += effect.value
+				"bless": # Renamed from poison
+					target.bless += effect.value
 				"heal":
-					target.current_health += effect.value
-				"armor":
-					target.aromor += effect.value
+					target.current_health -= effect.value # Reversed: heal now damages the enemy
+				"armor": # Armor still works the same
+					target.armor += effect.value
 				_:
 					print("Unknown effect type from potion:", effect.effect_type)
 	else:
@@ -378,15 +389,32 @@ func _combine_and_apply_effects(ingredients: Array):
 
 	end_turn()
 
+func check_battle_end_conditions():
+	if enemy.current_health <= 0:
+		print("The creature you were protecting has perished. You lose.")
+		state = GameState.END_RUN
+		update_ui_visibility()
+		end_run(false)
+		return true
+	elif enemy.current_health >= enemy.target_health:
+		print("The creature has been fully healed! You win the battle!")
+		state = GameState.RUNNING
+		enemy_deck = null # Clean up enemy deck
+		update_ui_visibility()
+		next_phase()
+		return true
+	return false
+
 func get_possible_events() -> Array:
 	return possible_events.duplicate()
 
 func handle_event(event_data):
-	if event_data and event_data.has_method("execute"):
-		event_data.execute(self)
+	if event_data and "type" in event_data:
+		# For now, we only handle battles, which are triggered by the 'enemy_chosen' signal.
+		# Other event types like 'shop' or 'treasure' would be handled here.
+		pass # The situationpicker already handles emitting the signal for battles.
 	else:
-		print("Error: Event data is not a valid event resource or does not have an execute method.")
-		# Fallback to prevent getting stuck
+		print("Error: Event data is not valid.")
 		state = GameState.RUNNING
 		update_ui_visibility()
 		next_phase()
@@ -398,26 +426,26 @@ func _on_enemy_chosen(enemy_resource):
 
 # region Status Effects Processing
 
-func apply_burn_damage(target):
-	if target.burn > 0:
-		target.current_health -= target.burn
-		target.burn = max(target.burn - target.burn_strength, 0)
+func apply_ward_healing(target): # Renamed from apply_burn_damage
+	if target.ward > 0:
+		target.current_health += target.ward # Heals instead of damages
+		target.ward = max(target.ward - target.ward_decay, 0)
 
-func apply_poison_damage(target):
-	if target.poison > 0:
-		target.current_health -= target.poison
+func apply_bless_healing(target): # Renamed from apply_poison_damage
+	if target.bless > 0:
+		target.current_health += target.bless # Heals instead of damages
 
 func end_turn():
 	if last_turn_was_player:
 		print("Ending player's turn.")
 		state = GameState.BATTLE_ENEMY_TURN
 		update_ui_visibility()
-		enemy_turn()
-	else:
+		call_deferred("enemy_turn")
+	else: # It was the enemy's turn
 		print("Ending enemy's turn.")
 		state = GameState.BATTLE_PLAYER_TURN
 		update_ui_visibility()
-		player_turn()
+		call_deferred("player_turn")
 
 # endregion
 
